@@ -11,39 +11,47 @@ class Request{
 		this.cookies = cookies;
 	}
 
-	NewRequest(url, respType, method, postData, header, cookies){
+	GetUrl(){
+		return this.url;
+	}
+
+	static NewRequest(url, respType, method, postData, header, cookies){
 		return new Request(url, respType, method, postData, header, cookies);
 	}
 
 	static async NewRequestWithHeaderFile(url, respType, headerFile){
-		console.log("222")
-		const stat = util.promisify(fs.stat);
-		const stats = await stat('.');
-  		console.log(`This directory is owned by ${stats.uid}`);
-		// try{
-		// 	let stats = util.promisify(fs.stat);
-		// 	let isExists = await stats('.');
-		// 	console.log(isExists);
-		// 	// if isExists{
-		// 	// 	readHeaderFromFile(url);
-		// 	// }else{
-		// 	// 	console.log("配置文件不存在");
-		// 	// }
-		// } catch(err){
-		// 	console.log("223131");
-		// 	console.log(err);
-		// }
+		try{
+			let stat = util.promisify(fs.stat);
+			let stats = await stat('.');
+			if(stats["size"] > 0){
+				let h = this.readHeaderFromFile(headerFile);
+				let req = await this.NewRequest(url, respType, "GET", "", h, "");
+				return req;
+			}
+		} catch(err){
+			return this.NewRequest(url, respType, "GET", "", "", "");
+		}
 	}
 
-	readHeaderFromFile(headerFile){
+	static readHeaderFromFile(headerFile){
 		let file = fs.readFileSync(headerFile);
 		let result = JSON.parse(file);
-		console.log(result);
+		let header = {};
+		for(let key in result){
+			if(key == "User-Agent" || key == "Referer" || key == "Cookie"){
+				header[key] = result[key];
+			}
+			header["Cache-Control"] = "max-age = 0";
+			header["Connection"] = "keep-alive";
+		}
+		return header;
 	}
 
 }
 
 module.exports = {
-	NewRequestWithHeaderFile: Request.NewRequestWithHeaderFile
+	NewRequestWithHeaderFile: Request.NewRequestWithHeaderFile,
+	readHeaderFromFile: Request.readHeaderFromFile,
+	NewRequest: Request.NewRequest
 }
 
