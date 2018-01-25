@@ -15,10 +15,10 @@ class Page{
 		this.targetRequests = targetRequests;
 	}
 
-	NewPage(pItems, req){
+	static NewPage(pItems, req){
 		return new Page(pItems = pItems, req = req)
 	}
-	
+	/ 
 }
 
 module.exports = {

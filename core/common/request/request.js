@@ -2,17 +2,26 @@ const fs = require("fs")
 const util = require("util")
 
 class Request{
-	constructor(url, respType, method, postData, header, cookies){
+	constructor(url, respType, method, postData, header, cookies, proxyHost = null){
 		this.url = url;
 		this.respType = respType;
 		this.method = method;
 		this.postData = postData;
 		this.header = header;
 		this.cookies = cookies;
+		this.proxyHost = proxyHost;
 	}
 
 	GetUrl(){
 		return this.url;
+	}
+
+	GetResponseType(){
+		return this.RespType;
+	}
+
+	GetProxyHost(){
+		return this.proxyHost;
 	}
 
 	static NewRequest(url, respType, method, postData, header, cookies){
